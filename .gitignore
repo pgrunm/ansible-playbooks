@@ -1,0 +1,4 @@
+# Ignore some file endings
+*.cfg
+*.txt
+*.retry

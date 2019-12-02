@@ -1,0 +1,43 @@
+---
+- hosts: pi
+
+  tasks:
+   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
+    - name: Pull latest pihole docker container
+      docker_container:
+       pull: yes
+       name: pihole
+       image: pihole/pihole
+       state: stopped
+    
+    - name: Stop the old pihole container
+      docker_container:
+        name: pihole
+        state: absent
+    
+    - name: Start the new pihole container
+      docker_container:
+        name: pihole
+        image: pihole/pihole
+        restart_policy: unless-stopped
+        detach: yes
+        ports:
+          - "53:53"
+          - "53:53/udp"
+          - "80:80"
+          - "443:443"
+        env:
+          TZ: "Europe/Berlin"
+          DNS1: "84.200.69.80"
+          DNS2: "84.200.70.40"
+          ServerIP: "192.168.2.15"
+          IPv6: "True"
+          ServerIPv6 : "fd00::b196:a3bc:2fe1:b0c9"
+        volumes:
+          - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/:/etc/pihole/
+          - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+        dns_servers: 
+        - "127.0.0.1"
+        - "84.200.69.80"
+        state: started
