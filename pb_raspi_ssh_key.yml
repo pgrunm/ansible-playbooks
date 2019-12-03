@@ -1,10 +1,10 @@
 ---
 - hosts: pis
-  remote_user: "{{ansible_ssh_user}}"
+  remote_user: "{{ansible_user}}"
 
   tasks:
     - name: Set authorized key taken from file
       authorized_key:
-        user: "{{ ansible_ssh_user }}"
+        user: "{{ ansible_user }}"
         state: present
         key: "{{ user_ssh_pub_key }}"
