@@ -17,4 +17,13 @@
         line: "PasswordAuthentication no"
         state: present
       notify: 
-        - Restart sshd
+        - Restart ssh
+
+    - name: Disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin no"
+        state: present
+      notify: 
+        - Restart ssh
