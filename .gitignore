@@ -2,3 +2,6 @@
 *.cfg
 *.txt
 *.retry
+
+# Host files
+*hosts*
