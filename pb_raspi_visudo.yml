@@ -3,8 +3,18 @@
   # You may need to add --ask-become-pass -b on the command line
   become: yes
   tasks:
-    - lineinfile:
+    - name: Allow passwordless sudo for my account
+      lineinfile:
         path: /etc/sudoers
         state: present
-        line: 'pascal ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
+        line: "pascal ALL=(ALL) NOPASSWD: ALL"
+        validate: "visudo -cf %s"
+
+    - name: Disallow password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+        state: present
+      notify: 
+        - Restart sshd
