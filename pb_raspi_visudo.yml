@@ -1,0 +1,8 @@
+---
+- hosts: pis
+  tasks:
+    - lineinfile:
+        path: /etc/sudoers
+        state: present
+        line: 'pascal ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
