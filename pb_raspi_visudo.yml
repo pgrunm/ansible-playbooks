@@ -1,5 +1,7 @@
 ---
 - hosts: pis
+  # You may need to add --ask-become-pass -b on the command line
+  become: yes
   tasks:
     - lineinfile:
         path: /etc/sudoers
