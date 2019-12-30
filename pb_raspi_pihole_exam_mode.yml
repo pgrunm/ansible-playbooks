@@ -1,0 +1,16 @@
+---
+- hosts: pis
+  # You may need to add --ask-become-pass -b on the command line
+  become: yes
+  tasks:
+    - name: Disable access for multiple sites by blocking DNS
+      blockinfile:
+        path: /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/blacklist.txt
+        state: present
+        content: "
+          pr0gramm.com
+          heise.de
+          golem.de
+          glm.io
+          steampowered.com
+          reddit.com"
