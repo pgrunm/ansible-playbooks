@@ -7,10 +7,10 @@
       blockinfile:
         path: /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/blacklist.txt
         state: present
-        content: "
+        content: |
           pr0gramm.com
           heise.de
           golem.de
           glm.io
           steampowered.com
-          reddit.com"
+          reddit.com
