@@ -1,5 +1,5 @@
 ---
-- hosts: pis
+- hosts: new_pis
   # You may need to add --ask-become-pass -b on the command line
   become: yes
   tasks:
@@ -25,5 +25,8 @@
         regexp: "^PermitRootLogin"
         line: "PermitRootLogin no"
         state: present
-      notify: 
-        - Restart ssh
+    
+    - name: Restart ssh daemon
+      service:
+        name: sshd 
+        state: restarted
