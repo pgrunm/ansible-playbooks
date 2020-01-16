@@ -1,0 +1,12 @@
+---
+- hosts: new_pis
+  tasks:
+    - name: Add the user 'pascal' 
+      user:
+        name: pascal
+
+    - name: Set authorized key taken from file
+      authorized_key:
+        user: "pascal"
+        state: present
+        key: "{{ lookup('file', '/home/pascal/pub') }}"
