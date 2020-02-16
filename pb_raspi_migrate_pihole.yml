@@ -1,0 +1,14 @@
+---
+- hosts: 192.168.2.16
+  become: yes
+  tasks:
+    - name: Ping the Raspi
+      ping:
+    
+    # Sync the source files to the new raspi
+    # - name: Copy the original pihole data to the new pi
+    #   synchronize: 
+    #     src: "/home/pascal/docker-pi-hole/etc-dnsmasq.d" 
+    #     dest: /home/pascal/pihole/etc-dnsmasq.d
+    #   delegate_to: 192.168.2.15
+
