@@ -10,3 +10,9 @@
         user: "pascal"
         state: present
         key: "{{ lookup('file', '/home/pascal/pub') }}"
+    - name: Remove the default user 'pi' 
+      user:
+        name: pi
+        ensure: absent
+        ansible_ssh_user: pascal
+
