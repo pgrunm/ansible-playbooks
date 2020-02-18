@@ -1,6 +1,6 @@
 ---
 - hosts: 192.168.2.16
-  become: yes
+  # become: yes
   tasks:
     - name: Ping the Raspi
       ping:
@@ -11,4 +11,17 @@
     #     src: "/home/pascal/docker-pi-hole/etc-dnsmasq.d" 
     #     dest: /home/pascal/pihole/etc-dnsmasq.d
     #   delegate_to: 192.168.2.15
+    - name: Creates k3s directory
+      file: 
+        path: /home/{{ansible_ssh_user}}/k3s 
+        state: directory
 
+    - name: Download k3s
+      get_url:
+        url: https://get.k3s.io
+        dest: /home/{{ansible_ssh_user}}/k3s/install.sh
+        mode: '0700'
+    
+    - name: Install k3s
+      command:
+        cmd: sh /home/{{ansible_ssh_user}}/k3s/install.sh
