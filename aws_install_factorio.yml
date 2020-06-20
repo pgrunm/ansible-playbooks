@@ -27,7 +27,15 @@
         state: directory
         mode: '0755'
       become: yes
-
+    
+    # https://docs.ansible.com/ansible/latest/modules/get_url_module.html
+    - name: Download the Factorio binary file
+      get_url:
+        url: https://www.factorio.com/get-download/0.17.79/headless/linux64
+        dest: /opt/factorio/server_17_79.tar.xz
+        mode: '0440'
+        owner: factorio
+      become: yes
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
 # Factorio Init Script: https://github.com/Bisa/factorio-init
