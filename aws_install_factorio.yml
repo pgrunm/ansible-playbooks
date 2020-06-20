@@ -36,6 +36,15 @@
         mode: '0440'
         owner: factorio
       become: yes
+    
+    # https://docs.ansible.com/ansible/latest/modules/unarchive_module.html
+    - name: Unarchive the Factorio binary
+      unarchive:
+        src: /opt/factorio/server_17_79.tar.xz
+        dest: /opt/
+        owner: factorio
+        remote_src: yes # Important!!!
+      become: yes
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
 # Factorio Init Script: https://github.com/Bisa/factorio-init
