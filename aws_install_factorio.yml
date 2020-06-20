@@ -55,13 +55,16 @@
     
     - name: Copy the example server file
       copy:
-        src: /opt/factorio/data/server-settings.example.json
+        src: files/factorio/server-settings.json
+        # Upload the local file
         dest: /opt/factorio/data/server-settings.json
         owner: factorio
-        remote_src: yes
-
-    # Edit the factorio config file
-
+    
+    - name: Upload the save file
+      copy: 
+        src: /mnt/c/Users/User/AppData/Roaming/Factorio/saves/Zaichik.zip 
+        dest: /opt/factorio/saves/Zaichik.zip
+        owner: factorio
 
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
