@@ -66,6 +66,18 @@
         dest: /opt/factorio/saves/Zaichik.zip
         owner: factorio
 
+    # Create a systemd file
+    - name: Upload the systemd file
+      copy:
+        src: files/factorio/factorio.service
+        dest: /etc/systemd/system/factorio.service
+
+    - name: Make sure Factorio service is enabled and running
+      systemd:
+        state: started
+        name: factorio
+        enabled: yes
+        daemon_reload: yes
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
 # Factorio Init Script: https://github.com/Bisa/factorio-init
