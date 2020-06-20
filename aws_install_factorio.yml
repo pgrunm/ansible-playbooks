@@ -1,5 +1,6 @@
 ---
 - hosts: aws
+  become: yes
   tasks:
     - name: Ping the AWS VM
       ping:
@@ -45,6 +46,23 @@
         owner: factorio
         remote_src: yes # Important!!!
       become: yes
+
+    - name: Create the save directory
+      file:
+        path: /opt/factorio/saves
+        owner: factorio
+        state: directory
+    
+    - name: Copy the example server file
+      copy:
+        src: /opt/factorio/data/server-settings.example.json
+        dest: /opt/factorio/data/server-settings.json
+        owner: factorio
+        remote_src: yes
+
+    # Edit the factorio config file
+
+
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
 # Factorio Init Script: https://github.com/Bisa/factorio-init
