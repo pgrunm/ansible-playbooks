@@ -18,6 +18,16 @@
         state: present
       become: yes
 
+    # https://docs.ansible.com/ansible/latest/modules/file_module.html
+    - name: Create the Factorio directory for the download
+      file:
+        path: /opt/factorio/
+        owner: factorio
+        group: root
+        state: directory
+        mode: '0755'
+      become: yes
+
 # Further documentation
 # How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
 # Factorio Init Script: https://github.com/Bisa/factorio-init
