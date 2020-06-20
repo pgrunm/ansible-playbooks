@@ -1,0 +1,23 @@
+---
+- hosts: aws
+  tasks:
+    - name: Ping the AWS VM
+      ping:
+    
+    - name: upgrade all packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Add the user factorio with no home directory
+      user:
+        name: factorio
+        shell: /sbin/nologin
+        append: yes
+        comment: Factorio service user
+        state: present
+      become: yes
+
+# Further documentation
+# How to Factorio headless: https://gist.github.com/othyn/e1287fd937c1e267cdbcef07227ed48c
+# Factorio Init Script: https://github.com/Bisa/factorio-init
