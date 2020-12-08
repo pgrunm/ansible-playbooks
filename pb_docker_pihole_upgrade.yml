@@ -1,5 +1,5 @@
 ---
-- hosts: pi
+- hosts: pis
 
   tasks:
    # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
