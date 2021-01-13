@@ -1,5 +1,6 @@
 ---
 - hosts: pis
+  vars:
 
   become: yes
   tasks:
@@ -34,10 +35,11 @@
         restart_policy: unless-stopped
         detach: yes
         ports:
+          # Syntax: Hostport : Container Port
           - "53:53"
           - "53:53/udp"
-          - "80:80"
-          - "443:443"
+          - "127.0.0.1:47080:80"
+          - "127.0.0.1:47443:443"
         env:
           TZ: "Europe/Berlin"
           DNS1: "84.200.69.80"
@@ -52,3 +54,6 @@
         - "127.0.0.1"
         - "84.200.69.80"
         state: started
+        purge_networks: yes
+        networks:
+         - name: "{{ docker_network_name }}"
