@@ -3,5 +3,9 @@
 *.txt
 *.retry
 
+# Certificate files
+*.crt
+*.key
+
 # Host files
 *hosts*
