@@ -1,0 +1,38 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+
+  tasks:
+   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
+    - name: Create the Nginx config directory
+      file:
+        path: /home/{{ansible_ssh_user}}/docker-nginx
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Copy the Nginx config file
+      copy:
+        src: files/nginx-reverse-proxy/nginx.conf
+        # Upload the local file
+        dest: /home/{{ansible_ssh_user}}/docker-nginx/nginx.conf
+        owner: "{{ansible_ssh_user}}"
+    
+    - name: Start the Nginx server container
+      docker_container:
+        name: nginx-proxy
+        pull: yes
+        image: nginx:stable-alpine
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        ports:
+          - "80:80"
+        volumes:
+          - /home/{{ansible_ssh_user}}/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
