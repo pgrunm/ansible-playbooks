@@ -20,6 +20,31 @@
         dest: /home/{{ansible_ssh_user}}/docker-nginx/nginx.conf
         owner: "{{ansible_ssh_user}}"
     
+    # TLS Setup
+    - name: Copy the Nginx crt file
+      copy:
+        src: files/nginx-reverse-proxy/nginx.crt
+        dest: /home/{{ansible_ssh_user}}/docker-nginx/nginx.crt
+        owner: "{{ansible_ssh_user}}"
+
+    - name: Replace start cert line in crt file
+      ansible.builtin.lineinfile:
+        path: "/home/{{ansible_ssh_user}}/docker-nginx/nginx.crt"
+        regexp: '-----BEGIN CERTIFICATE-----'
+        line: -----BEGIN TRUSTED CERTIFICATE-----
+    
+    - name: Replace end cert line in crt file
+      ansible.builtin.lineinfile:
+        path: "/home/{{ansible_ssh_user}}/docker-nginx/nginx.crt"
+        regexp: -----END CERTIFICATE-----
+        line: '-----END TRUSTED CERTIFICATE-----'
+    
+    - name: Copy the Nginx key file
+      copy:
+        src: files/nginx-reverse-proxy/nginx.key
+        dest: /home/{{ansible_ssh_user}}/docker-nginx/nginx.key
+        owner: "{{ansible_ssh_user}}"
+    
     - name: Start the Nginx server container
       docker_container:
         name: nginx-proxy
@@ -30,8 +55,11 @@
         detach: yes
         ports:
           - "80:80"
+          - "443:443"
         volumes:
           - /home/{{ansible_ssh_user}}/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+          - /home/{{ansible_ssh_user}}/docker-nginx/nginx.crt:/etc/ssl/nginx.crt
+          - /home/{{ansible_ssh_user}}/docker-nginx/nginx.key:/etc/ssl/nginx.key
         state: started
         networks:
          - name: "{{ docker_network_name }}"
