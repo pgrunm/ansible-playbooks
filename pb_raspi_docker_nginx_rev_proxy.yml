@@ -64,3 +64,4 @@
         networks:
          - name: "{{ docker_network_name }}"
         purge_networks: yes
+        networks_cli_compatible: yes
