@@ -1,0 +1,65 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    syncthing_folder: "/home/{{ansible_ssh_user}}/Syncthing"
+    syncthing_bk_folder: "/home/{{ansible_ssh_user}}/Syncthing_bk"
+    syncthing_config: "/home/{{ansible_ssh_user}}/.config/syncthing/"
+
+  tasks:
+    - name: Create the syncthing directory
+      file:
+        path: "{{syncthing_folder}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+    
+    - name: Create the syncthing backup directory
+      file:
+        path: "{{syncthing_bk_folder}}/backup"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Backup Syncthing files and folders
+      ansible.builtin.copy:
+        src: "{{syncthing_config}}"
+        dest: "{{syncthing_bk_folder}}/backup"
+        remote_src: yes 
+
+    # - name: Remove the syncthing package
+    #   apt:
+    #     name: syncthing
+    #     state: absent
+    #   become: true
+
+    - name: Stop the Syncthing host service 
+      ansible.builtin.systemd:
+        name: syncthing@pascal.service
+        enabled: false
+        state: stopped
+      become: true
+
+    # Run the Syncthing container
+    - name: Start the Syncthing container
+      docker_container:
+        name: syncthing
+        image: syncthing/syncthing
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        pull: yes
+        ports:
+          # Syntax: Hostport : Container Port
+          - "127.0.0.1:8384:8384"
+          - "22000:22000"
+        env:
+          # TZ: "Europe/Berlin"
+          # DNS1: "84.200.69.80"
+        volumes:
+          # User Syncthing folder to container folder
+          - "{{syncthing_folder}}:/var/syncthing"
+        state: started
+        purge_networks: yes
+        networks:
+         - name: "{{ docker_network_name }}"
+        networks_cli_compatible: yes
