@@ -29,7 +29,7 @@
 
     - name: Copy the Nginx proxy config file
       copy:
-        src: files/nginx-reverse-proxy/nginx_ssl.conf
+        src: files/nginx-reverse-proxy/nginx_proxy.conf
         # Upload the local file
         dest: /home/{{ansible_ssh_user}}/docker-nginx/nginx_proxy.conf
         owner: "{{ansible_ssh_user}}"
@@ -75,6 +75,7 @@
         volumes:
           - /home/{{ansible_ssh_user}}/docker-nginx/nginx.conf:/etc/nginx/nginx.conf:ro
           - /home/{{ansible_ssh_user}}/docker-nginx/nginx_ssl.conf:/etc/nginx/nginx_ssl.conf:ro
+          - /home/{{ansible_ssh_user}}/docker-nginx/nginx_proxy.conf:/etc/nginx/nginx_proxy.conf:ro
           - /home/{{ansible_ssh_user}}/docker-nginx/nginx.crt:/etc/ssl/nginx.crt
           - /home/{{ansible_ssh_user}}/docker-nginx/nginx.key:/etc/ssl/nginx.key
         state: started
