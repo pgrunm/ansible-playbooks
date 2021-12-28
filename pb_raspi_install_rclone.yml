@@ -1,0 +1,66 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    rclone_install_folder: "/home/{{ansible_ssh_user}}/rclone-install"
+
+  tasks:
+    - name: Create the rclone directory
+      file:
+        path: "{{rclone_install_folder}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Download and extract rclone
+      ansible.builtin.unarchive:
+        # src: "{{rclone_install_folder}}/rclone-current-linux-arm-v7.zip"
+        src: https://downloads.rclone.org/rclone-current-linux-arm-v7.zip
+        dest: "{{rclone_install_folder}}"
+        remote_src: yes
+        keep_newer: yes
+        extra_opts:
+          # Do not create any extra folders
+          - -j 
+
+    - name: Copy binary file to /usr/bin/
+      ansible.builtin.copy:
+        src: "{{rclone_install_folder}}/rclone"
+        dest: /usr/bin/
+        owner: root
+        group: root
+        remote_src: yes
+        mode: '0755'
+      become: yes
+
+    - name: Creates man page directory for Rclone
+      file:
+        path: /usr/local/share/man/man1/
+        state: directory
+      become: yes
+
+    - name: Install man page of Rclone
+      ansible.builtin.copy:
+        src: "{{rclone_install_folder}}/rclone.1"
+        dest: /usr/local/share/man/man1/
+        remote_src: yes
+      become: yes
+
+    - name: Copy rclone exclusion list 
+      ansible.builtin.copy:
+          src: "files/rclone/exclude.txt"
+          dest: "{{rclone_install_folder}}"
+
+    - name: Copy rclone script 
+      ansible.builtin.copy:
+          src: "files/rclone/rclone.sh"
+          dest: "{{rclone_install_folder}}/rclone.sh"
+          mode: 0744
+    
+    - name: Create the rclone cronjob
+      ansible.builtin.cron:
+        name: "Run Rclone backup"
+        minute: "0"
+        hour: "*/6"
+        job: "{{rclone_install_folder}}/rclone.sh"
+    

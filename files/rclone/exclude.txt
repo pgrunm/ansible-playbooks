@@ -1,0 +1,2 @@
+# Exclude the Syncthing config directory
+*config/**

@@ -9,3 +9,5 @@
 
 # Host files
 *hosts*
+
+!*exclude.txt
