@@ -8,11 +8,11 @@
     syncthing_config: "/home/{{ansible_ssh_user}}/.config/syncthing/"
 
   tasks:
-    - name: Create the syncthing directory
-      file:
-        path: "{{syncthing_folder}}"
-        owner: "{{ansible_ssh_user}}"
-        state: directory
+    # - name: Create the syncthing directory
+    #   file:
+    #     path: "{{syncthing_folder}}"
+    #     owner: "{{ansible_ssh_user}}"
+    #     state: directory
     
     - name: Create the syncthing backup directory
       file:
@@ -39,6 +39,13 @@
         state: stopped
       become: true
 
+    - name: Change user / group ids of files
+      ansible.builtin.file:
+         path: "{{syncthing_folder}}"
+         owner: 1001
+         group: 1001
+         recurse: yes
+
     # Run the Syncthing container
     - name: Start the Syncthing container
       docker_container:
@@ -52,9 +59,13 @@
           # Syntax: Hostport : Container Port
           - "127.0.0.1:8384:8384"
           - "22000:22000"
+          - "22000:22000/udp"
+          - "21027:21027/udp"
         env:
-          # TZ: "Europe/Berlin"
+          TZ: "Europe/Berlin"
           # DNS1: "84.200.69.80"
+          PUID: 1001
+          PGID: 1001
         volumes:
           # User Syncthing folder to container folder
           - "{{syncthing_folder}}:/var/syncthing"
