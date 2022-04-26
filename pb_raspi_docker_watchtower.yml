@@ -1,0 +1,30 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+
+  tasks:
+    # Run the Watchtower container
+    - name: Start the Watchtower container
+      docker_container:
+        name: watchtower
+        image: containrrr/watchtower:latest
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        pull: yes
+        env:
+          TZ: "Europe/Berlin"
+          WATCHTOWER_CLEANUP: "true"
+          WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+          WATCHTOWER_NOTIFICATION_URL: "telegram://{{telegram_bot_token}}@telegram?chats={{telegram_chat_id}}"
+          WATCHTOWER_ROLLING_RESTART: "true"
+        volumes:
+          # Docker Socket
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        state: started
+        purge_networks: yes
+        networks:
+         - name: "{{ docker_network_name }}"
+        networks_cli_compatible: yes
