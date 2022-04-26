@@ -12,59 +12,33 @@
         owner: "{{ansible_ssh_user}}"
         state: directory
     
-    - name: Clone the Discord bot repo into {{bot_folder}}
-      ansible.builtin.git:
-        repo: 'https://github.com/pgrunm/TPA-discord-bot.git'
-        dest: "{{bot_folder}}"
-
-    - name: Copy the local config file to the remote server
-      copy: 
-        src: /mnt/d/Daten/Programmieren/Python/Discordbot/.env_prod
-        dest: "{{bot_folder}}/.env" 
-    
-    - name: Copy the local database file to the remote server
-      copy: 
-        src: /mnt/d/Daten/Programmieren/Python/Discordbot/tpa.db
-        dest: "{{bot_folder}}/tpa.db" 
-        force: no 
- 
-    # https://docs.ansible.com/ansible/2.9/modules/docker_image_module.html
-    - name: Build the discord bot image
-      docker_image:
-        build:
-          path: "{{bot_folder}}"
-          dockerfile: "Dockerfile.armv7"
-          pull: no
-        name: tpa-discord-bot
-        tag: latest
-        push: no
-        source: build
-        force_source: yes
 
     # Run the Bot container
     # https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_module.html
 
     - name: Start the discord bot container
       docker_container:
-        name: tpa-discord-bot
-        image: tpa-discord-bot
+        name: pingubot
+        image: ghcr.io/the-penguin-army/pingubot:master
         # restart_policy: unless-stopped
-        restart: yes
         restart_retries: 3
+        restart: yes
         detach: yes
-        pull: no
-        # env:
-        #   bot_api_key: "1715558053:AAHvKe1UdazoIR8HHUA1FJesI8vBOe58KeM"
-        #   log_level: "INFO"
+        pull: yes
+        env:
+            TZ: "Europe/Berlin"
         volumes:
-          - "{{bot_folder}}:/app/tpa-discord/"
+          - "{{bot_folder}}:/app/tpa-discord/data/"
         state: started
         networks:
          - name: "{{ docker_network_name }}"
         purge_networks: yes
         networks_cli_compatible: yes
+        labels:
+            # Exclude from Watchtower upgrades
+            com.centurylinklabs.watchtower.enable: "false"
       
-    # - name: Stop the RTX Crawler container
+    # - name: Stop the Discord container
     #   docker_container:
     #     name: tpa-discord-bot
     #     state: stopped
