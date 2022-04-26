@@ -11,29 +11,13 @@
        name: python3-pip
        state: present
     
-    - name: Install docker package with pip3
-      pip:
-        name: docker
-        executable: pip3
-
-    - name: Pull latest pihole docker container
-      docker_container:
-       pull: yes
-       name: pihole
-       image: pihole/pihole
-       state: stopped
-    
-    - name: Stop the old pihole container
-      docker_container:
-        name: pihole
-        state: absent
-    
     - name: Start the new pihole container
       docker_container:
         name: pihole
         image: pihole/pihole
         restart_policy: unless-stopped
         detach: yes
+        pull: yes
         ports:
           # Syntax: Hostport : Container Port
           - "53:53"
@@ -42,11 +26,13 @@
           - "127.0.0.1:47443:443"
         env:
           TZ: "Europe/Berlin"
-          DNS1: "84.200.69.80"
-          DNS2: "84.200.70.40"
-          ServerIP: "192.168.2.15"
+          PIHOLE_DNS_1: "84.200.69.80"
+          PIHOLE_DNS_2: "84.200.70.40"
+          FTLCONF_REPLY_ADDR4: "192.168.2.15"
           IPv6: "True"
-          ServerIPv6 : "fd00::b196:a3bc:2fe1:b0c9"
+          FTLCONF_REPLY_ADDR6 : "fd00::b196:a3bc:2fe1:b0c9"
+          # https://github.com/pi-hole/docker-pi-hole#advanced-variables
+          FTLCONF_MAXDBDAYS: "90"
         volumes:
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/:/etc/pihole/
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/
@@ -55,5 +41,6 @@
         - "84.200.69.80"
         state: started
         purge_networks: yes
+        networks_cli_compatible: no
         networks:
          - name: "{{ docker_network_name }}"
