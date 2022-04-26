@@ -1,0 +1,32 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    monitorix_install_folder: "/home/{{ansible_ssh_user}}/monitorix"
+
+  tasks:
+    - name: Create the monitorix directory
+      file:
+        path: "{{monitorix_install_folder}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Install monitorix
+      apt:
+        name: monitorix
+        state: present
+      become: yes
+
+    - name: Copy local Monitorix config file
+      copy:
+        # Upload the local file
+        src: files/monitorix/monitorix.conf
+        dest: /etc/monitorix/monitorix.conf
+      become: yes
+    
+    - name: Restart monitorix
+      ansible.builtin.service:
+        name: monitorix
+        state: restarted
+      become: yes
