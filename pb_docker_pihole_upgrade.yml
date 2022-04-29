@@ -42,5 +42,7 @@
         state: started
         purge_networks: yes
         networks_cli_compatible: no
+        labels: 
+          com.centurylinklabs.watchtower.monitor-only: "true"
         networks:
          - name: "{{ docker_network_name }}"
