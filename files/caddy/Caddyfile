@@ -1,0 +1,19 @@
+pi.hole {
+    tls internal
+    # Reverse Proxy Setup for Pihole
+	reverse_proxy /admin/* pihole
+    
+    # Reverse Proxy Setup for Syncthing
+	reverse_proxy /syncthing/* syncthing:8384
+    
+    # Reverse Proxy Setup for Monitorix
+	# reverse_proxy /monitorix 172.19.0.1:58080
+    # reverse_proxy /monitorix/* 172.19.0.1:58080/monitorix/
+    # reverse_proxy /monitorix-cgi/* 172.19.0.1:58080/monitorix-cgi/
+}
+
+uptime.pi.hole {
+    tls internal
+    # Reverse Proxy Setup for Uptime Kuma
+    reverse_proxy uptime:3001
+}

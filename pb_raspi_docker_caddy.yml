@@ -1,0 +1,50 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    caddy_dir: "/home/{{ansible_ssh_user}}/docker-caddy"
+
+  tasks:
+   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
+    - name: Create the Caddy config directory
+      file:
+        path: "{{caddy_dir}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Copy the Caddyfile
+      copy:
+        src: files/caddy/Caddyfile
+        # Upload the local file
+        dest: "{{caddy_dir}}/Caddyfile"
+        owner: "{{ansible_ssh_user}}"
+
+      # Restart the Container
+    - name: Stop the Nginx server container
+      docker_container:
+        name: nginx-proxy
+        state: stopped
+    
+    - name: Start the Caddy server container
+      docker_container:
+        name: caddy
+        pull: yes
+        image: caddy:latest
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
+          - /home/pascal/docker-caddy/:/data
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes
