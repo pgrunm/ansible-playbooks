@@ -6,7 +6,8 @@
     caddy_dir: "/home/{{ansible_ssh_user}}/docker-caddy"
 
   tasks:
-   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+  # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+  # Caddy Docs: https://caddyserver.com/docs/
 
     - name: Create the Caddy config directory
       file:
@@ -21,30 +22,28 @@
         dest: "{{caddy_dir}}/Caddyfile"
         owner: "{{ansible_ssh_user}}"
 
-      # Restart the Container
-    - name: Stop the Nginx server container
-      docker_container:
-        name: nginx-proxy
-        state: stopped
-    
     - name: Start the Caddy server container
       docker_container:
         name: caddy
-        pull: yes
-        image: caddy:latest
-        restart_policy: unless-stopped
         restart: yes
-        detach: yes
-        env:
-          TZ: "Europe/Berlin"
-        ports:
-          - "80:80"
-          - "443:443"
-        volumes:
-          - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
-          - /home/pascal/docker-caddy/:/data
-        state: started
-        networks:
-         - name: "{{ docker_network_name }}"
-        purge_networks: yes
-        networks_cli_compatible: yes
+    # - name: Start the Caddy server container
+    #   docker_container:
+    #     name: caddy
+    #     pull: yes
+    #     image: caddy:latest
+    #     restart_policy: unless-stopped
+    #     restart: yes
+    #     detach: yes
+    #     env:
+    #       TZ: "Europe/Berlin"
+    #     ports:
+    #       - "80:80"
+    #       - "443:443"
+    #     volumes:
+    #       - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
+    #       - /home/pascal/docker-caddy/:/data
+    #     state: started
+    #     networks:
+    #      - name: "{{ docker_network_name }}"
+    #     purge_networks: yes
+    #     networks_cli_compatible: yes
