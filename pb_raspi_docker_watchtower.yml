@@ -20,6 +20,8 @@
           WATCHTOWER_NOTIFICATIONS: "shoutrrr"
           WATCHTOWER_NOTIFICATION_URL: "telegram://{{telegram_bot_token}}@telegram?chats={{telegram_chat_id}}"
           WATCHTOWER_ROLLING_RESTART: "true"
+          # Run updates every night at 3am.
+          WATCHTOWER_SCHEDULE: "0 0 3 * * *"
         volumes:
           # Docker Socket
           - "/var/run/docker.sock:/var/run/docker.sock"

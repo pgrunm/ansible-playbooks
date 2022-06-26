@@ -1,0 +1,95 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    netdata_dir: "/home/{{ansible_ssh_user}}/netdata"
+
+  tasks:
+   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
+    - name: Create the Netdata config directory
+      file:
+        path: "{{netdata_dir}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Copy the Netdata cloud config file
+      copy:
+        src: files/netdata/cloud.conf
+        # Upload the local file and disable the annoying cloud, see here:
+        # https://learn.netdata.cloud/docs/agent/aclk#disable-at-runtime
+        # /var/lib/netdata/cloud.d/cloud.conf
+        dest: /home/{{ansible_ssh_user}}/netdata/netdatalib/cloud.d/cloud.conf
+        owner: "201"
+        group: "201"
+      become: yes
+    - name: Copy the Netdata config file
+      copy:
+        src: files/netdata/netdata.conf
+        # Upload the local file
+        dest: /home/{{ansible_ssh_user}}/netdata/netdataconfig/netdata.conf
+        owner: "201"
+        group: "201"
+      become: yes
+    - name: Copy the Netdata alarm notification config file
+      copy:
+        src: files/netdata/health_alarm_notify.conf
+        # Upload the local file
+        dest: /home/{{ansible_ssh_user}}/netdata/netdataconfig/health_alarm_notify.conf
+        owner: "201"
+        group: "201"
+      become: yes
+
+    # Set Configuration tokens in notification file list
+    - name: Configure bot token in notification file
+      lineinfile:
+        path: /home/{{ansible_ssh_user}}/netdata/netdataconfig/health_alarm_notify.conf
+        search_string: 'bot_token'
+        line: "TELEGRAM_BOT_TOKEN=\"{{telegram_bot_token}}\""
+        owner: "201"
+        group: "201"
+      become: yes
+    - name: Configure chat id in notification file
+      lineinfile:
+        path: /home/{{ansible_ssh_user}}/netdata/netdataconfig/health_alarm_notify.conf
+        search_string: 'chat_id'
+        line: "DEFAULT_RECIPIENT_TELEGRAM=\"{{telegram_chat_id}}\""
+        owner: "201"
+        group: "201"
+      become: yes
+
+    - name: Start the Netdata server container
+      docker_container:
+        name: netdata
+        pull: yes
+        image: netdata/netdata:stable
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+          DISABLE_TELEMETRY: "1" 
+        # hostname: pi.hole # set to fqdn of host
+        ports:
+          # Syntax: Hostport : Container Port
+          - 127.0.0.1:19999:19999
+        capabilities:
+          - SYS_PTRACE
+        security_opts:
+          - apparmor:unconfined
+        volumes:
+          - "{{ netdata_dir }}/netdataconfig:/etc/netdata"
+          - "{{ netdata_dir }}/netdatalib:/var/lib/netdata"
+          - "{{ netdata_dir }}/netdatacache:/var/cache/netdata"
+          # System directories
+          - /etc/passwd:/host/etc/passwd:ro
+          - /etc/group:/host/etc/group:ro
+          - /proc:/host/proc:ro
+          - /sys:/host/sys:ro
+          - /etc/os-release:/host/etc/os-release:ro
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes

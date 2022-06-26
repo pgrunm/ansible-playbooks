@@ -1,0 +1,51 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    gitea_folder: "/home/{{ansible_ssh_user}}/docker-gitea"
+
+  tasks:
+    - name: Create the gitea directory
+      file:
+        path: "{{gitea_folder}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+       
+    # Clone the latest repo
+    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/git_module.html
+    - name: Clone a repo with separate git directory
+      git:
+        repo: https://git.tt-rss.org/fox/ttrss-docker-compose.git
+        dest: "{{tt_rss_folder}}"
+        force: yes
+
+    - name: Replace default password
+      ansible.builtin.lineinfile:
+        path: "{{tt_rss_folder}}/.env-dist"
+        regexp: '^POSTGRES_PASSWORD='
+        line: 'POSTGRES_PASSWORD={{tt_rss_pgrsql_pw}}'
+
+    - name: Replace self url path
+      ansible.builtin.lineinfile:
+        path: "{{tt_rss_folder}}/.env-dist"
+        regexp: '^SELF_URL_PATH='
+        line: "SELF_URL_PATH={{tt_rss_url}}"
+
+    - name: Copy file env-dist file to env file
+      ansible.builtin.copy:
+        remote_src: yes
+        src: "{{tt_rss_folder}}/.env-dist"
+        dest: "{{tt_rss_folder}}/.env"
+
+    - name: Copy local docker-compose file with network options
+      ansible.builtin.copy:
+        src: "files/tt-rss/docker-compose.yml"
+        dest: "{{tt_rss_folder}}/docker-compose.yml"
+
+    # https://docs.ansible.com/ansible/2.9/modules/docker_compose_module.html
+    - name: Create and start services
+      docker_compose:
+        project_src: "{{tt_rss_folder}}"
+        build: yes
+      register: output

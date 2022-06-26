@@ -1,0 +1,51 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    gotify_dir: "/home/{{ansible_ssh_user}}/gotify"
+
+  tasks:
+   # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+
+    - name: Create the Gotify config directory
+      file:
+        path: "{{gotify_dir}}"
+        owner: "{{ansible_ssh_user}}"
+        state: directory
+
+    - name: Start the Gotify server container
+      docker_container:
+        name: gotify
+        pull: yes
+        image: ghcr.io/gotify/server-arm7
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+          GOTIFY_SERVER_PORT: "80"
+          GOTIFY_SERVER_KEEPALIVEPERIODSECONDS: "0"
+          GOTIFY_SERVER_LISTENADDR: ""
+          GOTIFY_SERVER_SSL_ENABLED: "false"
+          GOTIFY_SERVER_SSL_REDIRECTTOHTTPS: "true"
+          GOTIFY_SERVER_SSL_LISTENADDR: ""
+          GOTIFY_SERVER_SSL_PORT: "443"
+          GOTIFY_SERVER_SSL_LETSENCRYPT_ENABLED: "false"
+          GOTIFY_SERVER_SSL_LETSENCRYPT_ACCEPTTOS: "false"
+          GOTIFY_SERVER_SSL_LETSENCRYPT_CACHE: "certs"
+          GOTIFY_SERVER_RESPONSEHEADERS: "X-Custom-Header: \"custom value\""
+          GOTIFY_SERVER_STREAM_PINGPERIODSECONDS: "45"
+          GOTIFY_DATABASE_DIALECT: "sqlite3"
+          GOTIFY_DATABASE_CONNECTION: data/gotify.db
+          GOTIFY_PASSSTRENGTH: "10"
+          GOTIFY_UPLOADEDIMAGESDIR: data/images
+          GOTIFY_PLUGINSDIR: data/plugins
+          GOTIFY_REGISTRATION: "false"
+        volumes:
+          - /home/pascal/gotify/:/app/data
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes
