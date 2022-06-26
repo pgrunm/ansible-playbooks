@@ -1,0 +1,52 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    shiori_dir: "/home/{{ansible_ssh_user}}/docker-shiori"
+
+  tasks:
+  # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+  # Caddy Docs: https://caddyserver.com/docs/
+
+    - name: Create the Shiori config directory
+      file:
+        path: "{{shiori_dir}}"
+        owner: "1000"
+        group: "1000"
+        state: directory
+      become: yes
+      
+    - name: Copy the Shiori database file
+      copy:
+        src: files/shiori/shiori.db
+        # Upload the local file
+        dest: "{{shiori_dir}}/shiori.db"
+        owner: "1000"
+        group: "1000"
+        force: no
+      become: yes
+
+    - name: Start the Shiori server container
+      docker_container:
+        name: shiori
+        pull: yes
+        image: ghcr.io/go-shiori/shiori:latest
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+        ports:
+          # Syntax: Hostport : Container Port
+          - "127.0.0.1:28080:8080"
+        volumes:
+          - /home/pascal/docker-shiori:/shiori
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes
+        # Modify the webroot to /shiori/ and start the container with this command. 
+        # Refer to: https://github.com/go-shiori/shiori/pull/374#issuecomment-1044704202
+        command: "serve --webroot /shiori/"

@@ -4,12 +4,36 @@ pi.hole {
 	reverse_proxy /admin/* pihole
     
     # Reverse Proxy Setup for Syncthing
-	reverse_proxy /syncthing/* syncthing:8384
+	#reverse_proxy /syncthing/* syncthing:8384
+	handle_path /syncthing/* {
+        reverse_proxy syncthing:8384
+    }
     
-    # Reverse Proxy Setup for Monitorix
-	# reverse_proxy /monitorix 172.19.0.1:58080
-    # reverse_proxy /monitorix/* 172.19.0.1:58080/monitorix/
-    # reverse_proxy /monitorix-cgi/* 172.19.0.1:58080/monitorix-cgi/
+    # Reverse Proxy Setup for Gotify
+    handle_path /gotify/* {
+	    reverse_proxy gotify:80
+    }
+
+    # Reverse Proxy Setup for netdata
+    handle_path /netdata/* {
+	    reverse_proxy netdata:19999
+    }
+
+    # Reverse Proxy Setup for shiori
+    redir /shiori /shiori/
+    handle /shiori/* {
+        reverse_proxy http://shiori:8080 
+    }
+
+    #handle_path /shiori/* {
+    #    # Cut prefixes
+    #    reverse_proxy shiori:8080
+    #
+    #    # Rewrite response
+    #    handle_response {
+    #        rewrite * /shiori/{path}
+    #    }
+    #} 
 }
 
 uptime.pi.hole {
