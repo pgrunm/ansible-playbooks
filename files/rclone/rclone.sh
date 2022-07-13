@@ -14,4 +14,10 @@
 # rclone sync ~/Syncthing secret:Syncthing/ --exclude-from ~/rclone/exclude.txt --delete-excluded --backup-dir secret:backup/ --suffix `date '+%Y-%m-%d-%H%M%S'` -n
 
 # Backup with .bk ending
-rclone sync ~/Syncthing secret:Syncthing/ --exclude-from ~/rclone/exclude.txt --delete-excluded --backup-dir secret:backup/ --suffix ".bk"
+#echo "Starting with Magenta Cloud..."
+rclone sync ~/Syncthing secret:Syncthing/ --exclude-from ~/rclone-install/exclude.txt --delete-excluded --backup-dir secret:backup/ --suffix ".bk" 
+#echo "Finished sync to Magenta Cloud..."
+
+#echo "Starting with Google Drive..."
+rclone sync ~/Syncthing gdrive-secret:Syncthing/ --exclude-from ~/rclone-install/exclude.txt --delete-excluded --backup-dir gdrive-secret:backup/ --suffix ".bk" 
+#echo "Finished Google Drive..."
