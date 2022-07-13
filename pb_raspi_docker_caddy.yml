@@ -22,10 +22,18 @@
         dest: "{{caddy_dir}}/Caddyfile"
         owner: "{{ansible_ssh_user}}"
 
-    - name: Start the Caddy server container
-      docker_container:
-        name: caddy
-        restart: yes
+    # Requires: https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_exec_module.html
+    - name: Reload the Caddy configuration # As this is way faster than a restart
+      community.docker.docker_container_exec:
+        container: caddy
+        command: caddy reload
+        chdir: /etc/caddy/
+      register: result
+
+    - name: Print stdout
+      debug:
+        var: result
+
     # - name: Start the Caddy server container
     #   docker_container:
     #     name: caddy
