@@ -17,21 +17,24 @@
         state: directory
       become: yes
       
-    - name: Start the Yarr server container
+    - name: Start the feedpushr server container
       docker_container:
         name: rss
         pull: yes
-        image: arsfeld/yarr
+        image: ncarlier/feedpushr
         restart_policy: unless-stopped
         restart: yes
         detach: yes
         env:
           TZ: "Europe/Berlin"
+          FP_PUBLIC_URL: "https://{{ansible_webserver_domain}}/rss"
+          FP_DB: "boltdb:///data/data.db"
         ports:
           # Syntax: Hostport : Container Port
-          - "127.0.0.1:27070:7070"
+          - "127.0.0.1:27070:8080"
         volumes:
           - /home/pascal/docker-rss:/data/
+          # - /home/pascal/docker-rss:/usr/local/share/",
         state: started
         networks:
          - name: "{{ docker_network_name }}"

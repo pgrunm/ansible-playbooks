@@ -1,3 +1,23 @@
+{$SITE_ADDRESS} {
+    # Reverse Proxy Setup for shiori
+    redir /shiori /shiori/
+    handle /shiori/* {
+        reverse_proxy http://shiori:8080 
+    }
+    
+    # Reverse Proxy Setup for Gotify
+    redir /gotify /gotify/
+    handle_path /gotify/* {
+	    reverse_proxy gotify:80
+    }
+
+    # Reverse Proxy Setup for Yarr
+    redir /rss /rss/
+    handle_path /rss/* {
+	    reverse_proxy rss:8080
+    }
+}
+
 pi.hole {
     tls internal
     # Reverse Proxy Setup for Pihole
@@ -10,6 +30,7 @@ pi.hole {
     }
     
     # Reverse Proxy Setup for Gotify
+    redir /gotify /gotify/
     handle_path /gotify/* {
 	    reverse_proxy gotify:80
     }
