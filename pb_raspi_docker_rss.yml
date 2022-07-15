@@ -1,0 +1,39 @@
+---
+- hosts: 192.168.2.15
+  remote_user: "{{ansible_ssh_user}}"
+  vars:
+    docker_network_name: "pi"
+    rss_dir: "/home/{{ansible_ssh_user}}/docker-rss"
+
+  tasks:
+  # Siehe: https://docs.ansible.com/ansible/latest/modules/docker_container_module.html
+  # Caddy Docs: https://caddyserver.com/docs/
+
+    - name: Create the Rss config directory
+      file:
+        path: "{{rss_dir}}"
+        owner: "1000"
+        group: "1000"
+        state: directory
+      become: yes
+      
+    - name: Start the Yarr server container
+      docker_container:
+        name: rss
+        pull: yes
+        image: arsfeld/yarr
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+        ports:
+          # Syntax: Hostport : Container Port
+          - "127.0.0.1:27070:7070"
+        volumes:
+          - /home/pascal/docker-rss:/data/
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes
