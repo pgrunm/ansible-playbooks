@@ -23,42 +23,42 @@
         owner: "{{ansible_ssh_user}}"
 
 
-    # - name: Start the Caddy server container
-    #   docker_container:
-    #     name: caddy
-    #     pull: yes
-    #     image: caddy:latest
-    #     restart_policy: unless-stopped
-    #     restart: yes
-    #     detach: yes
-    #     env:
-    #       TZ: "Europe/Berlin"
-    #       SITE_ADDRESS: "{{ansible_webserver_domain}}"
-    #     ports:
-    #       - "80:80"
-    #       - "443:443"
-    #     volumes:
-    #       - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
-    #       - /home/pascal/docker-caddy/:/data
-    #     state: started
-    #     networks:
-    #      - name: "{{ docker_network_name }}"
-    #     purge_networks: yes
-    #     networks_cli_compatible: yes
+    - name: Start the Caddy server container
+      docker_container:
+        name: caddy
+        pull: yes
+        image: caddy:latest
+        restart_policy: unless-stopped
+        restart: yes
+        detach: yes
+        env:
+          TZ: "Europe/Berlin"
+          SITE_ADDRESS: "{{ansible_webserver_domain}}"
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
+          - /home/pascal/docker-caddy/:/data
+        state: started
+        networks:
+         - name: "{{ docker_network_name }}"
+        purge_networks: yes
+        networks_cli_compatible: yes
 
-    # Requires: https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_exec_module.html
-    - name: Reload the Caddy configuration # As this is way faster than a restart
-      community.docker.docker_container_exec:
-        container: caddy
-        command: caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
-        # chdir: /etc/caddy/
-        # argv:
-        #   - caddy
-        #   - reload
-        #   - -config
-        #   - /etc/caddy/Caddyfile
-      register: result
+    # # Requires: https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_exec_module.html
+    # - name: Reload the Caddy configuration # As this is way faster than a restart
+    #   community.docker.docker_container_exec:
+    #     container: caddy
+    #     command: caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+    #     # chdir: /etc/caddy/
+    #     # argv:
+    #     #   - caddy
+    #     #   - reload
+    #     #   - -config
+    #     #   - /etc/caddy/Caddyfile
+    #   register: result
 
-    - name: Print stdout
-      debug:
-        var: result
+    # - name: Print stdout
+    #   debug:
+    #     var: result
