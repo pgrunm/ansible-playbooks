@@ -14,18 +14,29 @@
     # Reverse Proxy Setup for Yarr
     redir /rss /rss/
     handle /rss/* {
-	    reverse_proxy 192.168.2.15:27070
+	    reverse_proxy 172.19.0.1:27070
+	    #reverse_proxy 192.168.2.15:27070
     }
+
+    # Reverse Proxy Setup for Monitorix
+    redir /monitorix /monitorix/
+    handle /monitorix/* {
+	    reverse_proxy 172.19.0.1:58080
+    }
+    handle /monitorix-cgi/* {
+	    reverse_proxy 172.19.0.1:58080
+    }
+
 }
 
 pi.hole {
     tls internal
     # Reverse Proxy Setup for Pihole
     redir /admin /admin/
-	reverse_proxy /admin/* pihole
+    reverse_proxy /admin/* pihole
     
     # Reverse Proxy Setup for Syncthing
-	#reverse_proxy /syncthing/* syncthing:8384
+    #reverse_proxy /syncthing/* syncthing:8384
     redir /syncthing /syncthing/
 	handle_path /syncthing/* {
         reverse_proxy syncthing:8384
@@ -51,8 +62,19 @@ pi.hole {
 
     redir /rss /rss/
     handle /rss/* {
-	    reverse_proxy 192.168.2.15:27070
+	    reverse_proxy 172.19.0.1:27070
     }
+
+    # Reverse Proxy Setup for Monitorix
+    redir /monitorix /monitorix/
+    handle /monitorix/* {
+	    reverse_proxy 172.19.0.1:58080
+    }
+    handle /monitorix-cgi/* {
+	    reverse_proxy 172.19.0.1:58080
+    }
+
+
 }
 
 uptime.pi.hole {
