@@ -13,18 +13,20 @@
 
     # Reverse Proxy Setup for Yarr
     redir /rss /rss/
-    handle_path /rss/* {
-	    reverse_proxy rss:8080
+    handle /rss/* {
+	    reverse_proxy 192.168.2.15:27070
     }
 }
 
 pi.hole {
     tls internal
     # Reverse Proxy Setup for Pihole
+    redir /admin /admin/
 	reverse_proxy /admin/* pihole
     
     # Reverse Proxy Setup for Syncthing
 	#reverse_proxy /syncthing/* syncthing:8384
+    redir /syncthing /syncthing/
 	handle_path /syncthing/* {
         reverse_proxy syncthing:8384
     }
@@ -36,6 +38,7 @@ pi.hole {
     }
 
     # Reverse Proxy Setup for netdata
+    redir /netdata /netdata/
     handle_path /netdata/* {
 	    reverse_proxy netdata:19999
     }
@@ -46,15 +49,10 @@ pi.hole {
         reverse_proxy http://shiori:8080 
     }
 
-    #handle_path /shiori/* {
-    #    # Cut prefixes
-    #    reverse_proxy shiori:8080
-    #
-    #    # Rewrite response
-    #    handle_response {
-    #        rewrite * /shiori/{path}
-    #    }
-    #} 
+    redir /rss /rss/
+    handle /rss/* {
+	    reverse_proxy 192.168.2.15:27070
+    }
 }
 
 uptime.pi.hole {
