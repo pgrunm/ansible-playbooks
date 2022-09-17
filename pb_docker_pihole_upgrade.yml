@@ -26,8 +26,10 @@
           - "127.0.0.1:47443:443"
         env:
           TZ: "Europe/Berlin"
-          PIHOLE_DNS_1: "84.200.69.80"
-          PIHOLE_DNS_2: "84.200.70.40"
+          # Change to Quad9, see here:
+          # https://www.quad9.org/service/service-addresses-and-features#rec
+          PIHOLE_DNS_1: "9.9.9.9"
+          PIHOLE_DNS_2: "149.112.112.112"
           FTLCONF_REPLY_ADDR4: "192.168.2.15"
           IPv6: "True"
           FTLCONF_REPLY_ADDR6 : "fd00::b196:a3bc:2fe1:b0c9"
@@ -36,9 +38,9 @@
         volumes:
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/:/etc/pihole/
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/
-        dns_servers: 
-        - "127.0.0.1"
-        - "84.200.69.80"
+        # dns_servers: 
+        # - "127.0.0.1"
+        # - "84.200.69.80"
         state: started
         purge_networks: yes
         networks_cli_compatible: no
