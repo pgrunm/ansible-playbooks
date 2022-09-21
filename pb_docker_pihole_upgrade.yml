@@ -31,10 +31,11 @@
           PIHOLE_DNS_1: "9.9.9.9"
           PIHOLE_DNS_2: "149.112.112.112"
           FTLCONF_REPLY_ADDR4: "192.168.2.15"
-          IPv6: "True"
-          FTLCONF_REPLY_ADDR6 : "fd00::b196:a3bc:2fe1:b0c9"
+          IPv6: "true"
+          FTLCONF_REPLY_ADDR6 : "fe80::8f0:51d1:73d5:beb8"
           # https://github.com/pi-hole/docker-pi-hole#advanced-variables
           FTLCONF_MAXDBDAYS: "90"
+          QUERY_LOGGING: "false"
         volumes:
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-pihole/:/etc/pihole/
           - /home/{{ansible_ssh_user}}/docker-pi-hole/etc-dnsmasq.d/:/etc/dnsmasq.d/
