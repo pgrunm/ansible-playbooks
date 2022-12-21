@@ -40,6 +40,7 @@
         volumes:
           - /home/pascal/docker-caddy/Caddyfile:/etc/caddy/Caddyfile
           - /home/pascal/docker-caddy/:/data
+          - /home/pascal/wedding:/etc/caddy/www
         state: started
         networks:
          - name: "{{ docker_network_name }}"

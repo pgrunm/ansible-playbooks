@@ -27,6 +27,13 @@
 	    reverse_proxy 172.19.0.1:58080
     }
 
+    # Hochzeits Webseite
+    redir /wedding /wedding/
+    handle_path /wedding/* {
+	encode gzip
+	root * /etc/caddy/www/
+        file_server
+    }
 }
 
 pi.hole {
