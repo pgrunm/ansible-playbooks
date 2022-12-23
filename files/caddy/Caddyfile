@@ -1,4 +1,5 @@
 {$SITE_ADDRESS} {
+    metrics
     # Reverse Proxy Setup for shiori
     redir /shiori /shiori/
     handle /shiori/* {
@@ -38,6 +39,7 @@
 
 pi.hole {
     tls internal
+    metrics 
     # Reverse Proxy Setup for Pihole
     redir /admin /admin/
     reverse_proxy /admin/* pihole
@@ -85,6 +87,7 @@ pi.hole {
 }
 
 uptime.pi.hole {
+    metrics
     tls internal
     # Reverse Proxy Setup for Uptime Kuma
     reverse_proxy uptime:3001
